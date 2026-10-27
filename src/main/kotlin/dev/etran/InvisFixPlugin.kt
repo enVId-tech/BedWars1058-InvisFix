@@ -30,7 +30,21 @@ class InvisFixPlugin : JavaPlugin(), Listener {
         saveDefaultConfig()
         settings = Settings(config)
         tracker = Tracker(this)
-        Packets.register(this, tracker)
+        tracker.protocolLib = try {
+            if (server.pluginManager.getPlugin("ProtocolLib")?.isEnabled == true) {
+                Packets.register(this, tracker)
+                true
+            } else {
+                false
+            }
+        } catch (t: Throwable) {
+            logger.warning("ProtocolLib could not be hooked: $t")
+            false
+        }
+        if (!tracker.protocolLib) {
+            logger.warning("ProtocolLib not found: armor is hidden with BedWars' own packets (it can reappear briefly " +
+                "when a player comes into view) and walking sounds are NOT hidden. Install ProtocolLib for the full effect.")
+        }
         tracker.start()
         server.pluginManager.registerEvents(this, this)
         logger.info("BedWars1058-InvisFix enabled (BedWars API: ${BedWarsHook.prefix}).")
@@ -38,7 +52,7 @@ class InvisFixPlugin : JavaPlugin(), Listener {
 
     override fun onDisable() {
         if (::tracker.isInitialized) {
-            Packets.unregister()
+            if (tracker.protocolLib) Packets.unregister()
             tracker.shutdown()
         }
     }

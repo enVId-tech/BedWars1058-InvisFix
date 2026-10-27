@@ -24,6 +24,9 @@ class Tracker(private val plugin: InvisFixPlugin) {
 
     val footsteps = Footsteps()
 
+    /** True when ProtocolLib is installed; without it armor falls back to BedWars' own hide / show packets. */
+    var protocolLib = false
+
     private val invisType: PotionEffectType? = PotionEffectType.INVISIBILITY
 
     /** Scoreboards on which we hid each invisible player's name tag. */
@@ -143,11 +146,11 @@ class Tracker(private val plugin: InvisFixPlugin) {
         invisible.putAll(now)
 
         // State changes: make clients re-read the armor (the packet filter decides what they get).
-        for ((id, p) in players) if (!before.contains(id)) Packets.refreshArmor(p)
+        for ((id, p) in players) if (!before.contains(id)) refreshArmor(p)
         for (id in before) {
             if (now.containsKey(id)) continue
             Bukkit.getOnlinePlayers().firstOrNull { it.entityId == id }?.let {
-                Packets.refreshArmor(it)
+                refreshArmor(it)
                 footsteps.forget(it.uniqueId)
                 clearTags(it.uniqueId, id)
                 BedWarsHook.fireInvisRemoved(it) // BedWars puts the player back into their team / tab format
@@ -155,9 +158,26 @@ class Tracker(private val plugin: InvisFixPlugin) {
         }
 
         ticks++
+        // Without ProtocolLib nothing filters armor packets, so hide it again regularly.
+        if (!protocolLib && s.hideArmor && ticks % 20L == 0L) for ((_, p) in players) refreshArmor(p)
         for ((_, p) in players) {
             footsteps.tick(p, s)
             if (s.hideNametags) applyTags(p, force = ticks % 40L == 0L)
+        }
+    }
+
+    /** Show / hide [target]'s armor to everybody who can see them, with or without ProtocolLib. */
+    private fun refreshArmor(target: Player) {
+        if (protocolLib) {
+            Packets.refreshArmor(target)
+            return
+        }
+        val s = plugin.settings
+        val owner = invisible[target.entityId]
+        for (v in target.world.players) {
+            if (v == target) continue
+            val hide = owner != null && s.hideArmor && (s.armorHideFromTeammates || !sameTeam(v.uniqueId, owner))
+            BedWarsHook.setArmorHidden(target, v, hide)
         }
     }
 
@@ -176,7 +196,7 @@ class Tracker(private val plugin: InvisFixPlugin) {
         footsteps.clear()
         for (id in ids) {
             Bukkit.getOnlinePlayers().firstOrNull { it.entityId == id }?.let {
-                Packets.refreshArmor(it)
+                refreshArmor(it)
                 clearTags(it.uniqueId, id)
                 BedWarsHook.fireInvisRemoved(it)
             }

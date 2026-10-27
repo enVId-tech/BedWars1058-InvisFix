@@ -86,4 +86,10 @@ object BedWarsHook {
         } catch (_: Throwable) {
         }
     }
+
+    /** BedWars' own armor-hiding packets (used when ProtocolLib is not installed). */
+    fun setArmorHidden(victim: Player, viewer: Player, hidden: Boolean) {
+        val vs = Reflect.call(api, "getVersionSupport") ?: return
+        Reflect.call(vs, if (hidden) "hideArmor" else "showArmor", victim, viewer)
+    }
 }

@@ -23,6 +23,7 @@ damage:
   reveal-on-any-damage: false
 
 armor:
+  # Needs nothing extra, but works best with ProtocolLib (see README).
   # Hide helmet / chestplate / leggings / boots of invisible players (held items stay visible, like Hypixel).
   hide: true
   # Teammates see the armor too when false (they can see their invisible teammates in vanilla anyway).
