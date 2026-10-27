@@ -1,0 +1,16 @@
+name: BedWars1058-InvisFix
+main: dev.etran.InvisFixPlugin
+version: ${version}
+api-version: 1.13
+depend: [ProtocolLib]
+softdepend: [BedWars1058, BedWars2023]
+description: Hypixel-style invisibility potions for BedWars1058 - hidden armor, footsteps, silent walking.
+commands:
+  bw-invisfix:
+    aliases: [bwif]
+    description: Admin command for BedWars1058-InvisFix.
+    usage: /bw-invisfix <reload | status | config ...>
+    permission: invisfix.admin
+permissions:
+  invisfix.admin:
+    default: op

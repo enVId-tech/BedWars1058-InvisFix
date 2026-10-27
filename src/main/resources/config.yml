@@ -1,0 +1,49 @@
+# ==========================================================================================
+#  BedWars1058-InvisFix - config.yml
+#  /bw-invisfix reload re-reads this file, /bw-invisfix config set <path> <value> edits it in game.
+# ==========================================================================================
+
+# Only treat players as invisible while they are playing in a BedWars game (recommended).
+only-in-bedwars: true
+
+particles:
+  # Remove the swirling potion particles from invisibility (BedWars1058 can glitch with them).
+  # The effect is re-applied once with the same duration, just without particles.
+  hide: true
+
+nametags:
+  # Hide the name tag of invisible players (puts them in a "never show name tag" team on each viewer's
+  # scoreboard; BedWars is told to restore their normal team when invisibility ends).
+  hide: true
+
+damage:
+  # Invisibility ends when the player takes damage from another player (melee, arrows, snowballs ...).
+  reveal-on-player-damage: false
+  # Invisibility ends when the player takes any damage (fall, fire, void, explosions, other players ...).
+  reveal-on-any-damage: false
+
+armor:
+  # Hide helmet / chestplate / leggings / boots of invisible players (held items stay visible, like Hypixel).
+  hide: true
+  # Teammates see the armor too when false (they can see their invisible teammates in vanilla anyway).
+  hide-from-teammates: false
+
+sounds:
+  # Drop the walking (step) sounds of invisible players. Every other sound - hits, bows, blocks being
+  # placed or broken, potions, hurt sounds - is left alone.
+  hide-walking: true
+  # Teammates cannot hear the footsteps either when true.
+  hide-from-teammates: true
+
+footsteps:
+  # Leave footprints behind while invisible.
+  enabled: true
+  # Blocks walked between two footprints.
+  stride: 0.6
+  # Keep leaving footprints while sneaking.
+  while-sneaking: true
+  # AUTO = the real footprint particle on 1.8 - 1.12, small grey dust on 1.13+ (which has no footprint particle).
+  # Any org.bukkit.Particle name (1.13+) also works, e.g. SMOKE.
+  particle: AUTO
+  # Particles per footprint.
+  count: 1
